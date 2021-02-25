@@ -14,3 +14,7 @@ Changelog:
 - Set overall color palette
 - Planned list of features to implement before launching
 - Planned overall navigation and screen transitions
+- Prepared splash screen (icon, font, colors)
+- Requesting permission for READ_EXTERNAL_STORAGE
+- Stores information if user runs this app for the first time
+- Handles differently cases, where user used this application before, and where user has permitted (or not) the app to read files

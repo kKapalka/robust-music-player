@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="@drawable/test" />
+    <item
+        android:drawable="@drawable/hepho2"
+        android:gravity="center"
+        android:width="120dp"
+        android:height="120dp"
+        android:bottom="120dp"/>
+    <item
+        android:drawable="@drawable/bitmapa"
+        android:gravity="center"
+        android:width="180dp"
+        android:height="18dp"
+        android:top="240dp"/>
+</layer-list>
