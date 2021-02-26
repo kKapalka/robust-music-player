@@ -9,6 +9,12 @@ Planned features:
 Intended at this stage to be minimalistic.
 
 Changelog:
+### 26.02.2021
+- Worked a bit on Inital Activity layout
+- Prepared toolbar
+- Displaying all folders containing audio files, as an ugly string
+- added a temporary element to bottom of the view, to simulate currently selected audio file (test for visibility manipulation)
+
 ### 25.02.2021
 - Initialized the project
 - Set overall color palette
