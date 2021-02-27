@@ -4,18 +4,23 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.database.Cursor
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
 import android.view.Menu
 import android.widget.TextView
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.ActivityCompat
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import pl.rethagos.musicplayer.model.AudioFile
 import pl.rethagos.musicplayer.model.FolderPath
 import pl.rethagos.musicplayer.prefs.SharedPrefsSingleton
+import pl.rethagos.musicplayer.recyclerview.FolderPathAdapter
 import java.io.File
 import java.util.stream.Collectors
 import kotlin.system.exitProcess
@@ -24,10 +29,11 @@ import kotlin.system.exitProcess
 class InitialActivity : AppCompatActivity() {
 
     private lateinit var descText: TextView
-    private lateinit var textView: TextView
     private lateinit var helloLayout: ConstraintLayout
     private lateinit var toolbarNavi: Toolbar
+    private lateinit var recyclerView: RecyclerView
     private var readPermissionGranted: Boolean = false
+    private var folderPathList: ArrayList<FolderPath> = ArrayList()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         readPermissionGranted = ActivityCompat.checkSelfPermission(this@InitialActivity, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
@@ -42,10 +48,13 @@ class InitialActivity : AppCompatActivity() {
 
     private fun handleStandardLayoutDisplay() {
         setContentView(R.layout.activity_main)
-        textView = findViewById(R.id.textView)
         toolbarNavi = findViewById(R.id.toolbar_navi)
         setSupportActionBar(toolbarNavi)
-        textView.text = listFoldersFrom(null).toString()
+        recyclerView = findViewById(R.id.navi_recycler_view)
+        recyclerView.setHasFixedSize(true)
+        recyclerView.layoutManager = LinearLayoutManager(this)
+        prepareFolderPathList()
+        recyclerView.adapter = FolderPathAdapter(folderPathList, recyclerView)
     }
 
     // Menu icons are inflated just as they were with actionbar
@@ -56,43 +65,32 @@ class InitialActivity : AppCompatActivity() {
         return true
     }
 
-    fun listFoldersFrom(path: String?): List<FolderPath> {
-        var folderPathList: ArrayList<FolderPath> = ArrayList()
-        var relativePathList: ArrayList<String> = ArrayList()
-        if(path == null) {
-            println("path = null")
-            var c: Cursor? = contentResolver?.query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, arrayOf(MediaStore.Audio.AudioColumns.BUCKET_DISPLAY_NAME, MediaStore.Audio.AudioColumns.RELATIVE_PATH), null, null, null)
-            var relPath: String? = ""
-            var name: String? = ""
-            if(c != null) {
-                while(c.moveToNext()) {
-                    relPath = c.getString(1)
-                    if(relPath != null) {
-                        if (relPath in relativePathList) {
-                        } else {
-                            relativePathList.add(relPath)
-                            name = c.getString(0)
-                            folderPathList.add(FolderPath(c.getString(0), relPath.replace("/$name", "")))
-                        }
-                    }
-                }
-            }
-            c = contentResolver?.query(MediaStore.Audio.Media.INTERNAL_CONTENT_URI, arrayOf(MediaStore.Audio.AudioColumns.BUCKET_DISPLAY_NAME, MediaStore.Audio.AudioColumns.RELATIVE_PATH), null, null, null)
-            if(c != null) {
-                while(c.moveToNext()) {
-                    relPath = c.getString(1)
-                    if(relPath != null) {
-                        if (relPath in relativePathList) {
-                        } else {
-                            relativePathList.add(relPath)
-                            name = c.getString(0)
-                            folderPathList.add(FolderPath(c.getString(0), relPath.replace("/$name", "")))
-                        }
+    fun prepareFolderPathList(){
+        val relativePathList: ArrayList<String> = ArrayList()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            modifyFolderPathListsWithQueryUsingUri(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, relativePathList, folderPathList)
+            modifyFolderPathListsWithQueryUsingUri(MediaStore.Audio.Media.INTERNAL_CONTENT_URI, relativePathList, folderPathList)
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.Q)
+    private fun modifyFolderPathListsWithQueryUsingUri(uri: Uri, relPathList: ArrayList<String>, folderPathList: ArrayList<FolderPath>) {
+        var c: Cursor? = contentResolver?.query(uri, arrayOf(MediaStore.Audio.AudioColumns.BUCKET_DISPLAY_NAME, MediaStore.Audio.AudioColumns.RELATIVE_PATH), null, null, null)
+        var relPath: String? = ""
+        var name: String? = ""
+        if(c != null) {
+            while(c.moveToNext()) {
+                relPath = c.getString(1)
+                if(relPath != null) {
+                    if (relPath in relPathList) {
+                    } else {
+                        relPathList.add(relPath)
+                        name = c.getString(0)
+                        folderPathList.add(FolderPath(c.getString(0), relPath.replace("/$name", "")))
                     }
                 }
             }
         }
-        return folderPathList
     }
 
     private fun handleInitialLayoutDisplay() {

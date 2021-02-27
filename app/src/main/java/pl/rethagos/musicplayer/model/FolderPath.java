@@ -16,4 +16,12 @@ public class FolderPath {
                 ", folderPath='" + folderPath + '\'' +
                 '}';
     }
+
+    public String getFolderName() {
+        return folderName;
+    }
+
+    public String getFolderPath() {
+        return folderPath;
+    }
 }
