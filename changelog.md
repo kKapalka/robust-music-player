@@ -14,6 +14,7 @@ Changelog:
 - Prepared a RecyclerView containing all folders with music files, and hooked it up to main view
 - RecyclerView ViewHolders react to user touch with ripple effect
 - Created two different methods retrieving folder data - one for Android Q and newer, and older android versions (There are different media data columns used)
+- now it also logs out all music files from selected folder on registered click
 
 ### 26.02.2021
 - Worked a bit on Inital Activity layout

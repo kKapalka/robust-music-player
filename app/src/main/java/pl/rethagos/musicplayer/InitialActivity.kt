@@ -19,6 +19,7 @@ import androidx.recyclerview.widget.RecyclerView
 import pl.rethagos.musicplayer.model.FolderPath
 import pl.rethagos.musicplayer.prefs.SharedPrefsSingleton
 import pl.rethagos.musicplayer.recyclerview.FolderPathAdapter
+import pl.rethagos.musicplayer.recyclerview.OnFolderPathClickListener
 import kotlin.system.exitProcess
 
 
@@ -50,7 +51,11 @@ class InitialActivity : AppCompatActivity() {
         recyclerView.setHasFixedSize(true)
         recyclerView.layoutManager = LinearLayoutManager(this)
         prepareFolderPathList()
-        recyclerView.adapter = FolderPathAdapter(folderPathList, recyclerView)
+        recyclerView.adapter = FolderPathAdapter(folderPathList, recyclerView, object : OnFolderPathClickListener {
+            override fun onClick(folderPath: FolderPath?) {
+                navigateToMusicView(folderPath)
+            }
+        })
     }
 
     // Menu icons are inflated just as they were with actionbar
@@ -61,7 +66,28 @@ class InitialActivity : AppCompatActivity() {
         return true
     }
 
-    fun prepareFolderPathList(){
+    private fun navigateToMusicView(folderPath: FolderPath?) {
+        if(folderPath == null) {
+            return
+        }
+        val fullFolderPath: String = "%"+folderPath.folderPath + folderPath.folderName+"%"
+        var selection = ""
+        selection = if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            MediaStore.Audio.Media.RELATIVE_PATH + " like ? "
+        } else {
+            MediaStore.Audio.Media.DATA + " like ? "
+        }
+        val c: Cursor? = contentResolver?.query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, arrayOf(MediaStore.Audio.AudioColumns.DISPLAY_NAME), selection,
+                arrayOf(fullFolderPath), null)
+        if(c != null) {
+            while(c.moveToNext()) {
+                println(c.getString(0))
+            }
+        }
+        c?.close()
+    }
+
+    private fun prepareFolderPathList(){
         val relativePathList: ArrayList<String> = ArrayList()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             modifyFolderPathListsWithQueryUsingUri(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, relativePathList, folderPathList)
@@ -109,7 +135,7 @@ class InitialActivity : AppCompatActivity() {
                 } else {
                     relPathList.add(relPath)
                     folderName = relPath.replace(regex = Regex("(.*/)([^/]*)(/[^/]*/)$"), replacement = "$3")
-                    folderPathList.add(FolderPath(folderName.replace("/",""), relPath.replace(regex = Regex("(.*/)([^/]*)(/[^/]*/)$"), replacement = "$1$2")))
+                    folderPathList.add(FolderPath(folderName.replace("/",""), relPath.replace(regex = Regex("(.*/)([^/]*)(/[^/]*/)$"), replacement = "$1$2")+"/"))
                 }
             }
         }

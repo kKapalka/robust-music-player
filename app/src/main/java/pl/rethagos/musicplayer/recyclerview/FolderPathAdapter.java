@@ -21,16 +21,22 @@ public class FolderPathAdapter extends RecyclerView.Adapter {
 
     ArrayList<FolderPath> folderPaths;
     RecyclerView recyclerView;
+    OnFolderPathClickListener listener;
 
-    public FolderPathAdapter(ArrayList<FolderPath> folderPathArrayList, RecyclerView recyclerView) {
+    public FolderPathAdapter(ArrayList<FolderPath> folderPathArrayList, RecyclerView recyclerView, OnFolderPathClickListener listener) {
         this.folderPaths = folderPathArrayList;
         this.recyclerView = recyclerView;
+        this.listener = listener;
     }
     @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.layout_folder_path, parent, false);
+        view.setOnClickListener(v -> {
+            int currentPosition = recyclerView.getChildAdapterPosition(v);
+            listener.onClick(folderPaths.get(currentPosition));
+        });
         return new FolderPathViewHolder(view);
     }
 
