@@ -6,7 +6,6 @@ import android.database.Cursor
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.os.Environment
 import android.provider.MediaStore
 import android.view.Menu
 import android.widget.TextView
@@ -17,12 +16,9 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.ActivityCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import pl.rethagos.musicplayer.model.AudioFile
 import pl.rethagos.musicplayer.model.FolderPath
 import pl.rethagos.musicplayer.prefs.SharedPrefsSingleton
 import pl.rethagos.musicplayer.recyclerview.FolderPathAdapter
-import java.io.File
-import java.util.stream.Collectors
 import kotlin.system.exitProcess
 
 
@@ -70,14 +66,17 @@ class InitialActivity : AppCompatActivity() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             modifyFolderPathListsWithQueryUsingUri(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, relativePathList, folderPathList)
             modifyFolderPathListsWithQueryUsingUri(MediaStore.Audio.Media.INTERNAL_CONTENT_URI, relativePathList, folderPathList)
+        } else {
+            modifyFolderPathListsWithQueryUsingUriForOlderDevices(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, relativePathList, folderPathList)
+            modifyFolderPathListsWithQueryUsingUriForOlderDevices(MediaStore.Audio.Media.INTERNAL_CONTENT_URI, relativePathList, folderPathList)
         }
     }
 
     @RequiresApi(Build.VERSION_CODES.Q)
     private fun modifyFolderPathListsWithQueryUsingUri(uri: Uri, relPathList: ArrayList<String>, folderPathList: ArrayList<FolderPath>) {
-        var c: Cursor? = contentResolver?.query(uri, arrayOf(MediaStore.Audio.AudioColumns.BUCKET_DISPLAY_NAME, MediaStore.Audio.AudioColumns.RELATIVE_PATH), null, null, null)
+        val c: Cursor? = contentResolver?.query(uri, arrayOf(MediaStore.Audio.AudioColumns.BUCKET_DISPLAY_NAME, MediaStore.Audio.AudioColumns.RELATIVE_PATH), null, null, null)
         var relPath: String? = ""
-        var name: String? = ""
+        var name = ""
         if(c != null) {
             while(c.moveToNext()) {
                 relPath = c.getString(1)
@@ -91,6 +90,30 @@ class InitialActivity : AppCompatActivity() {
                 }
             }
         }
+        c?.close()
+    }
+
+    /**
+     * Differences noted between this and modifyFolderPathListsWithQueryUsingUri:
+     * This method includes more info regarding folder path (stuff like '/storage/some number/' and 'storage/emulated')
+     * Still need to determine how much it will affect app usage
+     */
+    private fun modifyFolderPathListsWithQueryUsingUriForOlderDevices(uri: Uri, relPathList: ArrayList<String>, folderPathList: ArrayList<FolderPath>) {
+        val c: Cursor? = contentResolver?.query(uri, arrayOf(MediaStore.Audio.Media.DATA, MediaStore.Audio.Media.DISPLAY_NAME), null, null, null)
+        var relPath: String? = ""
+        var folderName = ""
+        if(c != null) {
+            while(c.moveToNext()) {
+                relPath = c.getString(0).replace(c.getString(1), "")
+                if (relPath in relPathList) {
+                } else {
+                    relPathList.add(relPath)
+                    folderName = relPath.replace(regex = Regex("(.*/)([^/]*)(/[^/]*/)$"), replacement = "$3")
+                    folderPathList.add(FolderPath(folderName.replace("/",""), relPath.replace(regex = Regex("(.*/)([^/]*)(/[^/]*/)$"), replacement = "$1$2")))
+                }
+            }
+        }
+        c?.close()
     }
 
     private fun handleInitialLayoutDisplay() {

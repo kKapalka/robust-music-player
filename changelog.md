@@ -9,6 +9,12 @@ Planned features:
 Intended at this stage to be minimalistic.
 
 Changelog:
+
+### 27.02.2021
+- Prepared a RecyclerView containing all folders with music files, and hooked it up to main view
+- RecyclerView ViewHolders react to user touch with ripple effect
+- Created two different methods retrieving folder data - one for Android Q and newer, and older android versions (There are different media data columns used)
+
 ### 26.02.2021
 - Worked a bit on Inital Activity layout
 - Prepared toolbar
