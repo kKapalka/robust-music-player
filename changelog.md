@@ -10,6 +10,9 @@ Intended at this stage to be minimalistic.
 
 Changelog:
 
+### 28.02.2021
+- Now, user can navigate betweem folder and music. Need to change the implementation, though
+
 ### 27.02.2021
 - Prepared a RecyclerView containing all folders with music files, and hooked it up to main view
 - RecyclerView ViewHolders react to user touch with ripple effect

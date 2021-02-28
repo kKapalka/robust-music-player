@@ -1,6 +1,7 @@
 package pl.rethagos.musicplayer
 
 import android.Manifest
+import android.app.Application
 import android.content.pm.PackageManager
 import android.database.Cursor
 import android.net.Uri
@@ -8,6 +9,7 @@ import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
 import android.view.Menu
+import android.view.MenuItem
 import android.widget.TextView
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
@@ -16,9 +18,12 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.ActivityCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import pl.rethagos.musicplayer.model.AudioFile
 import pl.rethagos.musicplayer.model.FolderPath
 import pl.rethagos.musicplayer.prefs.SharedPrefsSingleton
+import pl.rethagos.musicplayer.recyclerview.AudioFileAdapter
 import pl.rethagos.musicplayer.recyclerview.FolderPathAdapter
+import pl.rethagos.musicplayer.recyclerview.OnAudioFileClickListener
 import pl.rethagos.musicplayer.recyclerview.OnFolderPathClickListener
 import kotlin.system.exitProcess
 
@@ -62,29 +67,50 @@ class InitialActivity : AppCompatActivity() {
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         // Inflate the menu; this adds items to the action bar if it is present.
         menuInflater.inflate(R.menu.menu_navi, menu)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
         return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            android.R.id.home -> {
+                supportActionBar?.setDisplayHomeAsUpEnabled(false)
+                supportActionBar?.title = getString(R.string.app_name)
+                recyclerView.adapter = FolderPathAdapter(folderPathList, recyclerView, object : OnFolderPathClickListener {
+                    override fun onClick(folderPath: FolderPath?) {
+                        navigateToMusicView(folderPath)
+                    }
+                })
+                return true
+            }
+            R.id.menu_settings -> {
+                println("settings pressed")
+            }
+        }
+        return super.onOptionsItemSelected(item)
     }
 
     private fun navigateToMusicView(folderPath: FolderPath?) {
         if(folderPath == null) {
             return
         }
+        var audioFileNames: ArrayList<String> = ArrayList()
         val fullFolderPath: String = "%"+folderPath.folderPath + folderPath.folderName+"%"
-        var selection = ""
-        selection = if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            MediaStore.Audio.Media.RELATIVE_PATH + " like ? "
-        } else {
-            MediaStore.Audio.Media.DATA + " like ? "
-        }
+        var selection = (if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)  MediaStore.Audio.Media.RELATIVE_PATH else MediaStore.Audio.Media.DATA ) + " like ? "
         val c: Cursor? = contentResolver?.query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, arrayOf(MediaStore.Audio.AudioColumns.DISPLAY_NAME), selection,
                 arrayOf(fullFolderPath), null)
         if(c != null) {
             while(c.moveToNext()) {
-                println(c.getString(0))
+                audioFileNames.add(c.getString(0))
             }
         }
         c?.close()
+        recyclerView.adapter = AudioFileAdapter(ArrayList(audioFileNames.map { AudioFile("", it, "", "", "") }), recyclerView, object : OnAudioFileClickListener {
+            override fun onClick(audioFile: AudioFile?) {
+                println(audioFile)
+            }
+        })
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.title = folderPath.folderName
     }
 
     private fun prepareFolderPathList(){
