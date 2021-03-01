@@ -1,7 +1,7 @@
-package pl.rethagos.musicplayer
+package pl.rethagos.musicplayer.activity
 
 import android.Manifest
-import android.app.Application
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.database.Cursor
 import android.net.Uri
@@ -18,6 +18,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.ActivityCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import pl.rethagos.musicplayer.R
 import pl.rethagos.musicplayer.model.AudioFile
 import pl.rethagos.musicplayer.model.FolderPath
 import pl.rethagos.musicplayer.prefs.SharedPrefsSingleton
@@ -106,7 +107,8 @@ class InitialActivity : AppCompatActivity() {
         c?.close()
         recyclerView.adapter = AudioFileAdapter(ArrayList(audioFileNames.map { AudioFile("", it, "", "", "") }), recyclerView, object : OnAudioFileClickListener {
             override fun onClick(audioFile: AudioFile?) {
-                println(audioFile)
+                val intent = Intent(applicationContext, MusicActivity::class.java)
+                startActivity(intent)
             }
         })
         supportActionBar?.setDisplayHomeAsUpEnabled(true)

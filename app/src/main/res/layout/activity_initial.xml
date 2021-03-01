@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:background="@drawable/test"
     android:backgroundTintMode="src_over"
-    tools:context=".InitialActivity">
+    tools:context=".activity.InitialActivity">
 
     <TextView
         android:id="@+id/textView2"
