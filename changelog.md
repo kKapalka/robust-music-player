@@ -10,6 +10,10 @@ Intended at this stage to be minimalistic.
 
 Changelog:
 
+### 03.03.2021
+- Tidied up some of the code
+- Files from Internal Content Uri are displayed properly
+
 ### 28.02.2021
 - Now, user can navigate betweem folder and music. Need to change the implementation, though
 

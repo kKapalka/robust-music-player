@@ -94,17 +94,11 @@ class InitialActivity : AppCompatActivity() {
         if(folderPath == null) {
             return
         }
-        var audioFileNames: ArrayList<String> = ArrayList()
+        val audioFileNames: ArrayList<String> = ArrayList()
         val fullFolderPath: String = "%"+folderPath.folderPath + folderPath.folderName+"%"
-        var selection = (if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)  MediaStore.Audio.Media.RELATIVE_PATH else MediaStore.Audio.Media.DATA ) + " like ? "
-        val c: Cursor? = contentResolver?.query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, arrayOf(MediaStore.Audio.AudioColumns.DISPLAY_NAME), selection,
-                arrayOf(fullFolderPath), null)
-        if(c != null) {
-            while(c.moveToNext()) {
-                audioFileNames.add(c.getString(0))
-            }
-        }
-        c?.close()
+        val selection = (if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)  MediaStore.Audio.Media.RELATIVE_PATH else MediaStore.Audio.Media.DATA ) + " like ? "
+        populateAudioFileNamesListUsingUri(MediaStore. Audio. Media. EXTERNAL_CONTENT_URI, selection, fullFolderPath, audioFileNames)
+        populateAudioFileNamesListUsingUri(MediaStore. Audio. Media. INTERNAL_CONTENT_URI, selection, fullFolderPath, audioFileNames)
         recyclerView.adapter = AudioFileAdapter(ArrayList(audioFileNames.map { AudioFile("", it, "", "", "") }), recyclerView, object : OnAudioFileClickListener {
             override fun onClick(audioFile: AudioFile?) {
                 val intent = Intent(applicationContext, MusicActivity::class.java)
@@ -113,6 +107,17 @@ class InitialActivity : AppCompatActivity() {
         })
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.title = folderPath.folderName
+    }
+
+    private fun populateAudioFileNamesListUsingUri(uri: Uri, selection: String, folderPath: String, audioFileNames: ArrayList<String>) {
+        val c: Cursor? = contentResolver?.query(uri, arrayOf(MediaStore.Audio.AudioColumns.DISPLAY_NAME), selection,
+            arrayOf(folderPath), null)
+        if(c != null) {
+            while(c.moveToNext()) {
+                audioFileNames.add(c.getString(0))
+            }
+        }
+        c?.close()
     }
 
     private fun prepareFolderPathList(){
@@ -128,15 +133,14 @@ class InitialActivity : AppCompatActivity() {
 
     @RequiresApi(Build.VERSION_CODES.Q)
     private fun modifyFolderPathListsWithQueryUsingUri(uri: Uri, relPathList: ArrayList<String>, folderPathList: ArrayList<FolderPath>) {
-        val c: Cursor? = contentResolver?.query(uri, arrayOf(MediaStore.Audio.AudioColumns.BUCKET_DISPLAY_NAME, MediaStore.Audio.AudioColumns.RELATIVE_PATH), null, null, null)
-        var relPath: String? = ""
-        var name = ""
+        val c = contentResolver?.query(uri, arrayOf(MediaStore.Audio.AudioColumns.BUCKET_DISPLAY_NAME, MediaStore.Audio.AudioColumns.RELATIVE_PATH), null, null, null)
+        var relPath: String
+        var name: String
         if(c != null) {
             while(c.moveToNext()) {
                 relPath = c.getString(1)
                 if(relPath != null) {
-                    if (relPath in relPathList) {
-                    } else {
+                    if (relPath !in relPathList) {
                         relPathList.add(relPath)
                         name = c.getString(0)
                         folderPathList.add(FolderPath(c.getString(0), relPath.replace("/$name", "")))
@@ -153,14 +157,13 @@ class InitialActivity : AppCompatActivity() {
      * Still need to determine how much it will affect app usage
      */
     private fun modifyFolderPathListsWithQueryUsingUriForOlderDevices(uri: Uri, relPathList: ArrayList<String>, folderPathList: ArrayList<FolderPath>) {
-        val c: Cursor? = contentResolver?.query(uri, arrayOf(MediaStore.Audio.Media.DATA, MediaStore.Audio.Media.DISPLAY_NAME), null, null, null)
-        var relPath: String? = ""
-        var folderName = ""
+        val c = contentResolver?.query(uri, arrayOf(MediaStore.Audio.Media.DATA, MediaStore.Audio.Media.DISPLAY_NAME), null, null, null)
+        var relPath: String
+        var folderName: String
         if(c != null) {
             while(c.moveToNext()) {
                 relPath = c.getString(0).replace(c.getString(1), "")
-                if (relPath in relPathList) {
-                } else {
+                if (relPath !in relPathList) {
                     relPathList.add(relPath)
                     folderName = relPath.replace(regex = Regex("(.*/)([^/]*)(/[^/]*/)$"), replacement = "$3")
                     folderPathList.add(FolderPath(folderName.replace("/",""), relPath.replace(regex = Regex("(.*/)([^/]*)(/[^/]*/)$"), replacement = "$1$2")+"/"))
