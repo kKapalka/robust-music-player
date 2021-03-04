@@ -10,6 +10,11 @@ Intended at this stage to be minimalistic.
 
 Changelog:
 
+### 04.03.2021
+- Worked a bit on layout of MusicActivity
+- Prepared a version for landscape mode, will be working on it soon
+- Detected a bug on simulator where application will fail to detect toolbar_navi if setContentView(activity_main) will be slacking too much
+
 ### 03.03.2021
 - Tidied up some of the code
 - Files from Internal Content Uri are displayed properly

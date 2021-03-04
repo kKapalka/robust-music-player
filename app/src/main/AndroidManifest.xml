@@ -14,7 +14,10 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.MyApplication">
-        <activity android:name=".activity.MusicActivity"></activity>
+        <activity android:name=".activity.MusicActivity"
+            android:theme="@style/SplashTheme">
+
+        </activity>
         <activity
             android:name=".activity.InitialActivity"
             android:theme="@style/SplashTheme">

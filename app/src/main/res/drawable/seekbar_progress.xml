@@ -6,9 +6,9 @@
         <clip>
             <shape
                 android:shape="rectangle" >
-                <size android:height="3dp"/>
+                <size android:height="2dp"/>
                 <corners
-                    android:radius="3dp" />
+                    android:radius="2dp" />
                 <solid android:color="@color/orange_peel"/>
             </shape>
         </clip>
