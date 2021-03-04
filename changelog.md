@@ -12,7 +12,7 @@ Changelog:
 
 ### 04.03.2021
 - Worked a bit on layout of MusicActivity
-- Prepared a version for landscape mode, will be working on it soon
+- Prepared a version of MusicActivity layout for landscape mode
 - Detected a bug on simulator where application will fail to detect toolbar_navi if setContentView(activity_main) will be slacking too much
 
 ### 03.03.2021

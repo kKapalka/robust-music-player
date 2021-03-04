@@ -34,16 +34,8 @@
         android:thumb="@drawable/seekbar_thumb"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/divider3" />
-
-    <View
-        android:id="@+id/divider3"
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="@android:color/transparent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintStart_toEndOf="@+id/divider4"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar_navi_music" />
 
     <TextView
         android:id="@+id/textView"
@@ -54,8 +46,8 @@
         android:textSize="22sp"
         app:layout_constraintBottom_toTopOf="@+id/seekBar"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/divider3" />
+        app:layout_constraintStart_toEndOf="@+id/divider4"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar_navi_music" />
 
     <TextView
         android:id="@+id/textView3"
@@ -67,7 +59,7 @@
         android:textSize="14sp"
         app:layout_constraintBottom_toTopOf="@+id/textView"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toEndOf="@+id/divider4" />
 
     <TextView
         android:id="@+id/textView4"
@@ -78,7 +70,7 @@
         android:textColor="@color/pewter_blue"
         android:textSize="14sp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/divider4"
         app:layout_constraintTop_toBottomOf="@+id/textView" />
 
     <TextView
@@ -107,8 +99,8 @@
         android:id="@+id/imageView"
         android:layout_width="160dp"
         android:layout_height="160dp"
-        app:layout_constraintBottom_toTopOf="@+id/divider3"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/divider4"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/toolbar_navi_music"
         app:srcCompat="@drawable/sadpepe" />
@@ -117,13 +109,13 @@
         android:id="@+id/button"
         android:layout_width="60dp"
         android:layout_height="60dp"
-        android:layout_marginTop="24dp"
         android:insetTop="0dp"
         android:insetBottom="0dp"
         android:text="Pl"
         app:iconPadding="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/divider4"
         app:layout_constraintTop_toBottomOf="@+id/seekBar" />
 
     <Button
@@ -176,6 +168,15 @@
         app:iconPadding="0dp"
         app:layout_constraintBottom_toBottomOf="@+id/button"
         app:layout_constraintEnd_toStartOf="@+id/button3"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/divider4"
         app:layout_constraintTop_toTopOf="@+id/button" />
+
+    <View
+        android:id="@+id/divider4"
+        android:layout_width="1dp"
+        android:layout_height="match_parent"
+        android:background="?android:attr/listDivider"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:layout_editor_absoluteY="27dp" />
 </androidx.constraintlayout.widget.ConstraintLayout>
