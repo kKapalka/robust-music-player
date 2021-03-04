@@ -35,7 +35,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/divider4"
-        app:layout_constraintTop_toBottomOf="@+id/toolbar_navi_music" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/textView"
@@ -102,13 +102,14 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/divider4"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/toolbar_navi_music"
+        app:layout_constraintTop_toTopOf="@+id/toolbar_navi_music"
         app:srcCompat="@drawable/sadpepe" />
 
     <Button
         android:id="@+id/button"
         android:layout_width="60dp"
         android:layout_height="60dp"
+        android:layout_marginBottom="24dp"
         android:insetTop="0dp"
         android:insetBottom="0dp"
         android:text="Pl"
