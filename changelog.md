@@ -10,6 +10,10 @@ Intended at this stage to be minimalistic.
 
 Changelog:
 
+### 05.03.2021
+- Fixed edge cases for fetching audio files
+- Stumbled upon the bug again
+
 ### 04.03.2021
 - Worked a bit on layout of MusicActivity
 - Prepared a version of MusicActivity layout for landscape mode

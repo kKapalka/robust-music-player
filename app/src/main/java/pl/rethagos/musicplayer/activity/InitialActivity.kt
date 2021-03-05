@@ -95,7 +95,7 @@ class InitialActivity : AppCompatActivity() {
             return
         }
         val audioFileNames: ArrayList<String> = ArrayList()
-        val fullFolderPath: String = "%"+folderPath.folderPath + folderPath.folderName+"%"
+        val fullFolderPath: String = "%"+folderPath.folderPath + folderPath.folderName+"/"
         val selection = (if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)  MediaStore.Audio.Media.RELATIVE_PATH else MediaStore.Audio.Media.DATA ) + " like ? "
         populateAudioFileNamesListUsingUri(MediaStore. Audio. Media. EXTERNAL_CONTENT_URI, selection, fullFolderPath, audioFileNames)
         populateAudioFileNamesListUsingUri(MediaStore. Audio. Media. INTERNAL_CONTENT_URI, selection, fullFolderPath, audioFileNames)
@@ -110,7 +110,7 @@ class InitialActivity : AppCompatActivity() {
     }
 
     private fun populateAudioFileNamesListUsingUri(uri: Uri, selection: String, folderPath: String, audioFileNames: ArrayList<String>) {
-        val c: Cursor? = contentResolver?.query(uri, arrayOf(MediaStore.Audio.AudioColumns.DISPLAY_NAME), selection,
+        val c: Cursor? = contentResolver?.query(uri, arrayOf(MediaStore.Audio.AudioColumns.DISPLAY_NAME, MediaStore.Audio.Media.RELATIVE_PATH), selection,
             arrayOf(folderPath), null)
         if(c != null) {
             while(c.moveToNext()) {
@@ -133,9 +133,9 @@ class InitialActivity : AppCompatActivity() {
 
     @RequiresApi(Build.VERSION_CODES.Q)
     private fun modifyFolderPathListsWithQueryUsingUri(uri: Uri, relPathList: ArrayList<String>, folderPathList: ArrayList<FolderPath>) {
-        val c = contentResolver?.query(uri, arrayOf(MediaStore.Audio.AudioColumns.BUCKET_DISPLAY_NAME, MediaStore.Audio.AudioColumns.RELATIVE_PATH), null, null, null)
-        var relPath: String
-        var name: String
+        val c = contentResolver?.query(uri, arrayOf(MediaStore.Audio.AudioColumns.BUCKET_DISPLAY_NAME, MediaStore.Audio.AudioColumns.RELATIVE_PATH, MediaStore.Audio.AudioColumns.DISPLAY_NAME), null, null, null)
+        var relPath: String?
+        var name: String?
         if(c != null) {
             while(c.moveToNext()) {
                 relPath = c.getString(1)
@@ -143,7 +143,7 @@ class InitialActivity : AppCompatActivity() {
                     if (relPath !in relPathList) {
                         relPathList.add(relPath)
                         name = c.getString(0)
-                        folderPathList.add(FolderPath(c.getString(0), relPath.replace("/$name", "")))
+                        folderPathList.add(FolderPath(c.getString(0), relPath.replace("$name/", "")))
                     }
                 }
             }
@@ -158,8 +158,8 @@ class InitialActivity : AppCompatActivity() {
      */
     private fun modifyFolderPathListsWithQueryUsingUriForOlderDevices(uri: Uri, relPathList: ArrayList<String>, folderPathList: ArrayList<FolderPath>) {
         val c = contentResolver?.query(uri, arrayOf(MediaStore.Audio.Media.DATA, MediaStore.Audio.Media.DISPLAY_NAME), null, null, null)
-        var relPath: String
-        var folderName: String
+        var relPath: String?
+        var folderName: String?
         if(c != null) {
             while(c.moveToNext()) {
                 relPath = c.getString(0).replace(c.getString(1), "")
