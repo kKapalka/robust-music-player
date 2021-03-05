@@ -42,7 +42,9 @@ class InitialActivity : AppCompatActivity() {
         readPermissionGranted = ActivityCompat.checkSelfPermission(this@InitialActivity, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
         SharedPrefsSingleton.instance?.init(this)
         if(!SharedPrefsSingleton.instance?.isInitialLaunch!! && readPermissionGranted) {
-            handleStandardLayoutDisplay()
+            runOnUiThread(java.lang.Runnable {
+                handleStandardLayoutDisplay()
+            })
         } else {
             handleInitialLayoutDisplay()
         }
@@ -184,7 +186,9 @@ class InitialActivity : AppCompatActivity() {
             if (!readPermissionGranted) {
                 ActivityCompat.requestPermissions(this@InitialActivity, arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), 123)
             } else {
-                handleStandardLayoutDisplay()
+                runOnUiThread(java.lang.Runnable {
+                    handleStandardLayoutDisplay()
+                })
             }
         }
         SharedPrefsSingleton.instance?.isInitialLaunch = false
