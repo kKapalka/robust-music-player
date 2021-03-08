@@ -1,21 +1,16 @@
 package pl.rethagos.musicplayer.activity
 
-import android.media.AsyncPlayer
-import android.os.Build
-import androidx.appcompat.app.AppCompatActivity
+import android.media.MediaMetadataRetriever
+import android.net.Uri
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import pl.rethagos.musicplayer.R
 import pl.rethagos.musicplayer.model.AudioFile
-import pl.rethagos.musicplayer.model.FolderPath
-import pl.rethagos.musicplayer.recyclerview.FolderPathAdapter
-import pl.rethagos.musicplayer.recyclerview.OnFolderPathClickListener
-import java.time.Duration
-import java.time.LocalTime
-import java.time.format.DateTimeFormatter
+
 
 class MusicActivity : AppCompatActivity() {
 
@@ -66,26 +61,31 @@ class MusicActivity : AppCompatActivity() {
     }
 
     private fun parseAsTime(duration: String?): String{
-        return if(duration == null){
-            "8:76"
+        var durationAsMillis: Int = if(duration.isNullOrBlank()){
+            val uri: Uri = Uri.parse(currentPath)
+            val mmr = MediaMetadataRetriever()
+            mmr.setDataSource(applicationContext, uri)
+            val durationStr = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
+            durationStr!!.toInt()
         } else {
-            val durAsInt = duration.toInt() / 1000
-            var seconds = (durAsInt % 60).toString()
-            var minutes = ((durAsInt / 60) % 60).toString()
-            var hours = ((durAsInt / 3600) % 24).toString()
-            if(hours != "0" && hours.length == 1) {
-                hours = "0$hours"
-            } else {
-                hours = ""
-            }
-            if(minutes != "0" && minutes.length == 1) {
-                minutes = "0$minutes"
-            }
-            if(seconds != "0" && seconds.length == 1) {
-                seconds = "0$seconds"
-            }
-            return (if(hours != "") "$hours:" else "") + "$minutes:$seconds"
+            duration.toInt()
         }
+        val durAsInt = durationAsMillis / 1000
+        var seconds = (durAsInt % 60).toString()
+        var minutes = ((durAsInt / 60) % 60).toString()
+        var hours = ((durAsInt / 3600) % 24).toString()
+        hours = if(hours != "0" && hours.length == 1) {
+            "0$hours:"
+        } else {
+            ""
+        }
+        if(minutes != "0" && minutes.length == 1) {
+            minutes = "0$minutes"
+        }
+        if(seconds != "0" && seconds.length == 1) {
+            seconds = "0$seconds"
+        }
+        return "$hours$minutes:$seconds"
     }
 
     // Menu icons are inflated just as they were with actionbar
