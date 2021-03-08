@@ -1,9 +1,11 @@
 package pl.rethagos.musicplayer.activity
 
+import android.media.AsyncPlayer
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.TextView
 import androidx.appcompat.widget.Toolbar
 import pl.rethagos.musicplayer.R
 import pl.rethagos.musicplayer.model.AudioFile
@@ -15,6 +17,13 @@ class MusicActivity : AppCompatActivity() {
 
     private lateinit var toolbarNavi: Toolbar
 
+    private lateinit var songName: TextView
+    private lateinit var songAuthor: TextView
+    private lateinit var songAlbum: TextView
+    private lateinit var songStart: TextView
+    private lateinit var songEnd: TextView
+
+
     private var currentTitle: String? = null
     private var currentPath: String? = null
     private var currentFolderFiles: ArrayList<AudioFile>? = null
@@ -22,6 +31,11 @@ class MusicActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_music)
+        songName = findViewById(R.id.songName)
+        songAuthor = findViewById(R.id.songAuthor)
+        songAlbum = findViewById(R.id.songAlbum)
+        songStart = findViewById(R.id.songStart)
+        songEnd = findViewById(R.id.songEnd)
         currentTitle = intent.extras?.getString("currentTitle")
         currentPath = intent.extras?.getString("currentPath")
         currentFolderFiles = intent.extras?.getSerializable("currentFolderFiles") as ArrayList<AudioFile>?
@@ -41,7 +55,7 @@ class MusicActivity : AppCompatActivity() {
     }
 
     private fun loadCurrentSong() {
-
+        songName.text = currentTitle
     }
 
     // Menu icons are inflated just as they were with actionbar
