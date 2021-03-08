@@ -1,6 +1,7 @@
 package pl.rethagos.musicplayer.activity
 
 import android.media.AsyncPlayer
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Menu
@@ -12,6 +13,9 @@ import pl.rethagos.musicplayer.model.AudioFile
 import pl.rethagos.musicplayer.model.FolderPath
 import pl.rethagos.musicplayer.recyclerview.FolderPathAdapter
 import pl.rethagos.musicplayer.recyclerview.OnFolderPathClickListener
+import java.time.Duration
+import java.time.LocalTime
+import java.time.format.DateTimeFormatter
 
 class MusicActivity : AppCompatActivity() {
 
@@ -27,6 +31,7 @@ class MusicActivity : AppCompatActivity() {
     private var currentTitle: String? = null
     private var currentPath: String? = null
     private var currentFolderFiles: ArrayList<AudioFile>? = null
+    private var currentAudioFile: AudioFile? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,10 +44,11 @@ class MusicActivity : AppCompatActivity() {
         currentTitle = intent.getStringExtra("currentTitle")
         currentPath = intent.getStringExtra("currentPath")
         currentFolderFiles = intent.getSerializableExtra("currentFolderFiles") as ArrayList<AudioFile>?
-
+        currentAudioFile = currentFolderFiles?.find { it.title == currentTitle }
         println(currentTitle)
         println(currentPath)
         println(currentFolderFiles)
+
 
         toolbarNavi = findViewById(R.id.toolbar_navi_music)
         setSupportActionBar(toolbarNavi)
@@ -56,6 +62,30 @@ class MusicActivity : AppCompatActivity() {
 
     private fun loadCurrentSong() {
         songName.text = currentTitle
+        songEnd.text = parseAsTime(currentAudioFile?.duration)
+    }
+
+    private fun parseAsTime(duration: String?): String{
+        return if(duration == null){
+            "8:76"
+        } else {
+            val durAsInt = duration.toInt() / 1000
+            var seconds = (durAsInt % 60).toString()
+            var minutes = ((durAsInt / 60) % 60).toString()
+            var hours = ((durAsInt / 3600) % 24).toString()
+            if(hours != "0" && hours.length == 1) {
+                hours = "0$hours"
+            } else {
+                hours = ""
+            }
+            if(minutes != "0" && minutes.length == 1) {
+                minutes = "0$minutes"
+            }
+            if(seconds != "0" && seconds.length == 1) {
+                seconds = "0$seconds"
+            }
+            return (if(hours != "") "$hours:" else "") + "$minutes:$seconds"
+        }
     }
 
     // Menu icons are inflated just as they were with actionbar

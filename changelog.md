@@ -13,6 +13,7 @@ Changelog:
 ### 08.03.2021
 - Renamed some of view elements
 - Set up InitialActivity to transmit all necessary data into MusicActivity
+- Parsing duration + transmitting more data with AudioFile objects
 
 ### 05.03.2021
 - Fixed edge cases for fetching audio files

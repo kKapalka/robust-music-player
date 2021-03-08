@@ -117,12 +117,22 @@ class InitialActivity : AppCompatActivity() {
     }
 
     private fun populateAudioFileNamesListUsingUri(uri: Uri, selection: String, folderPath: String, audioFileNames: ArrayList<AudioFile>) {
-        val c: Cursor? = contentResolver?.query(uri, arrayOf(MediaStore.Audio.AudioColumns.DISPLAY_NAME,
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)  MediaStore.Audio.Media.RELATIVE_PATH else MediaStore.Audio.Media.DATA),
+        var projection: ArrayList<String> = ArrayList()
+        projection.add(MediaStore.Audio.AudioColumns.DISPLAY_NAME)
+        projection.add(MediaStore.Audio.Media.ALBUM_ID)
+        projection.add(MediaStore.Audio.Media.ARTIST_ID)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            projection.add(MediaStore.Audio.Media.RELATIVE_PATH)
+            projection.add(MediaStore.Audio.Media.DURATION)
+        } else {
+            projection.add(MediaStore.Audio.Media.DATA)
+        }
+
+        val c: Cursor? = contentResolver?.query(uri, projection.toTypedArray(),
                 selection, arrayOf(folderPath), null)
         if(c != null) {
             while(c.moveToNext()) {
-                audioFileNames.add(AudioFile(c.getString(1), c.getString(0), "", "", ""))
+                audioFileNames.add(AudioFile(c.getString(3), c.getString(0), c.getString(1), c.getString(2), (if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) c.getString(4)  else "")))
             }
         }
         c?.close()
