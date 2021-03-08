@@ -14,6 +14,10 @@ Changelog:
 - Renamed some of view elements
 - Set up InitialActivity to transmit all necessary data into MusicActivity
 
+### 05.03.2021
+- Fixed edge cases for fetching audio files
+- Stumbled upon the bug again
+
 ### 04.03.2021
 - Worked a bit on layout of MusicActivity
 - Prepared a version of MusicActivity layout for landscape mode
