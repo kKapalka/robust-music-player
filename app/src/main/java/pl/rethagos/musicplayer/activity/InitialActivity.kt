@@ -85,6 +85,7 @@ class InitialActivity : AppCompatActivity() {
             }
             R.id.menu_settings -> {
                 println("settings pressed")
+                return true
             }
         }
         return super.onOptionsItemSelected(item)
@@ -94,14 +95,17 @@ class InitialActivity : AppCompatActivity() {
         if(folderPath == null) {
             return
         }
-        val audioFileNames: ArrayList<String> = ArrayList()
+        val audioFileNames: ArrayList<AudioFile> = ArrayList()
         val fullFolderPath: String = "%"+folderPath.folderPath + folderPath.folderName+"%"
         val selection = (if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)  MediaStore.Audio.Media.RELATIVE_PATH else MediaStore.Audio.Media.DATA ) + " like ? "
         populateAudioFileNamesListUsingUri(MediaStore. Audio. Media. EXTERNAL_CONTENT_URI, selection, fullFolderPath, audioFileNames)
         populateAudioFileNamesListUsingUri(MediaStore. Audio. Media. INTERNAL_CONTENT_URI, selection, fullFolderPath, audioFileNames)
-        recyclerView.adapter = AudioFileAdapter(ArrayList(audioFileNames.map { AudioFile("", it, "", "", "") }), recyclerView, object : OnAudioFileClickListener {
+        recyclerView.adapter = AudioFileAdapter(audioFileNames, recyclerView, object : OnAudioFileClickListener {
             override fun onClick(audioFile: AudioFile?) {
                 val intent = Intent(applicationContext, MusicActivity::class.java)
+                intent.extras?.putString("currentTitle", audioFile?.title)
+                intent.extras?.putSerializable("currentPath", audioFile?.path)
+                intent.extras?.putSerializable("currentFolderFiles", audioFileNames)
                 startActivity(intent)
             }
         })
@@ -109,12 +113,12 @@ class InitialActivity : AppCompatActivity() {
         supportActionBar?.title = folderPath.folderName
     }
 
-    private fun populateAudioFileNamesListUsingUri(uri: Uri, selection: String, folderPath: String, audioFileNames: ArrayList<String>) {
-        val c: Cursor? = contentResolver?.query(uri, arrayOf(MediaStore.Audio.AudioColumns.DISPLAY_NAME), selection,
+    private fun populateAudioFileNamesListUsingUri(uri: Uri, selection: String, folderPath: String, audioFileNames: ArrayList<AudioFile>) {
+        val c: Cursor? = contentResolver?.query(uri, arrayOf(MediaStore.Audio.AudioColumns.DISPLAY_NAME, selection), selection,
             arrayOf(folderPath), null)
         if(c != null) {
             while(c.moveToNext()) {
-                audioFileNames.add(c.getString(0))
+                audioFileNames.add(AudioFile(c.getString(1), c.getString(0), "", "", ""))
             }
         }
         c?.close()

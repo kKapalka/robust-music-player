@@ -10,6 +10,10 @@ Intended at this stage to be minimalistic.
 
 Changelog:
 
+### 08.03.2021
+- Renamed some of view elements
+- Set up InitialActivity to transmit all necessary data into MusicActivity
+
 ### 04.03.2021
 - Worked a bit on layout of MusicActivity
 - Prepared a version of MusicActivity layout for landscape mode
