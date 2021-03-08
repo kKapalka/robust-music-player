@@ -82,7 +82,7 @@ class MusicActivity : AppCompatActivity() {
         if(minutes != "0" && minutes.length == 1) {
             minutes = "0$minutes"
         }
-        if(seconds != "0" && seconds.length == 1) {
+        if(seconds.length == 1) {
             seconds = "0$seconds"
         }
         return "$hours$minutes:$seconds"
