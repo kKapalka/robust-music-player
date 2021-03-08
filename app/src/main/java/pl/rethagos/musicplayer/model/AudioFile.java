@@ -1,6 +1,8 @@
 package pl.rethagos.musicplayer.model;
 
-public class AudioFile {
+import java.io.Serializable;
+
+public class AudioFile implements Serializable {
     private String path;
     private String title;
     private String artist;
@@ -56,5 +58,16 @@ public class AudioFile {
 
     public void setDuration(String duration) {
         this.duration = duration;
+    }
+
+    @Override
+    public String toString() {
+        return "AudioFile{" +
+                "path='" + path + '\'' +
+                ", title='" + title + '\'' +
+                ", artist='" + artist + '\'' +
+                ", album='" + album + '\'' +
+                ", duration='" + duration + '\'' +
+                '}';
     }
 }

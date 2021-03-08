@@ -36,9 +36,9 @@ class MusicActivity : AppCompatActivity() {
         songAlbum = findViewById(R.id.songAlbum)
         songStart = findViewById(R.id.songStart)
         songEnd = findViewById(R.id.songEnd)
-        currentTitle = intent.extras?.getString("currentTitle")
-        currentPath = intent.extras?.getString("currentPath")
-        currentFolderFiles = intent.extras?.getSerializable("currentFolderFiles") as ArrayList<AudioFile>?
+        currentTitle = intent.getStringExtra("currentTitle")
+        currentPath = intent.getStringExtra("currentPath")
+        currentFolderFiles = intent.getSerializableExtra("currentFolderFiles") as ArrayList<AudioFile>?
 
         println(currentTitle)
         println(currentPath)

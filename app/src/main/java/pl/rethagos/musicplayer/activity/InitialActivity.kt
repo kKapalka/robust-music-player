@@ -104,10 +104,11 @@ class InitialActivity : AppCompatActivity() {
         populateAudioFileNamesListUsingUri(MediaStore. Audio. Media. INTERNAL_CONTENT_URI, selection, fullFolderPath, audioFileNames)
         recyclerView.adapter = AudioFileAdapter(audioFileNames, recyclerView, object : OnAudioFileClickListener {
             override fun onClick(audioFile: AudioFile?) {
+                println(audioFile)
                 val intent = Intent(applicationContext, MusicActivity::class.java)
-                intent.extras?.putString("currentTitle", audioFile?.title)
-                intent.extras?.putSerializable("currentPath", audioFile?.path)
-                intent.extras?.putSerializable("currentFolderFiles", audioFileNames)
+                intent.putExtra("currentTitle", audioFile?.title)
+                intent.putExtra("currentPath", audioFile?.path)
+                intent.putExtra("currentFolderFiles", audioFileNames)
                 startActivity(intent)
             }
         })
@@ -116,8 +117,9 @@ class InitialActivity : AppCompatActivity() {
     }
 
     private fun populateAudioFileNamesListUsingUri(uri: Uri, selection: String, folderPath: String, audioFileNames: ArrayList<AudioFile>) {
-        val c: Cursor? = contentResolver?.query(uri, arrayOf(MediaStore.Audio.AudioColumns.DISPLAY_NAME, selection), selection,
-            arrayOf(folderPath), null)
+        val c: Cursor? = contentResolver?.query(uri, arrayOf(MediaStore.Audio.AudioColumns.DISPLAY_NAME,
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)  MediaStore.Audio.Media.RELATIVE_PATH else MediaStore.Audio.Media.DATA),
+                selection, arrayOf(folderPath), null)
         if(c != null) {
             while(c.moveToNext()) {
                 audioFileNames.add(AudioFile(c.getString(1), c.getString(0), "", "", ""))
