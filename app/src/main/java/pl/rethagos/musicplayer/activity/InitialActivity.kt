@@ -98,7 +98,7 @@ class InitialActivity : AppCompatActivity() {
             return
         }
         val audioFileNames: ArrayList<AudioFile> = ArrayList()
-        val fullFolderPath: String = "%"+folderPath.folderPath + folderPath.folderName+"/"
+        val fullFolderPath = folderPath.folderPath + folderPath.folderName+"/"
         val selection = (if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)  MediaStore.Audio.Media.RELATIVE_PATH else MediaStore.Audio.Media.DATA ) + " like ? "
         populateAudioFileNamesListUsingUri(MediaStore. Audio. Media. EXTERNAL_CONTENT_URI, selection, fullFolderPath, audioFileNames)
         populateAudioFileNamesListUsingUri(MediaStore. Audio. Media. INTERNAL_CONTENT_URI, selection, fullFolderPath, audioFileNames)
@@ -117,7 +117,10 @@ class InitialActivity : AppCompatActivity() {
     }
 
     private fun populateAudioFileNamesListUsingUri(uri: Uri, selection: String, folderPath: String, audioFileNames: ArrayList<AudioFile>) {
-        var projection: ArrayList<String> = ArrayList()
+        val fullFolderPath = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
+            "%$folderPath" else "%$folderPath%"
+        println(fullFolderPath)
+        val projection: ArrayList<String> = ArrayList()
         projection.add(MediaStore.Audio.AudioColumns.DISPLAY_NAME)
         projection.add(MediaStore.Audio.Media.ALBUM_ID)
         projection.add(MediaStore.Audio.Media.ARTIST_ID)
@@ -129,10 +132,16 @@ class InitialActivity : AppCompatActivity() {
         }
 
         val c: Cursor? = contentResolver?.query(uri, projection.toTypedArray(),
-                selection, arrayOf(folderPath), null)
+                selection, arrayOf(fullFolderPath), null)
         if(c != null) {
             while(c.moveToNext()) {
-                audioFileNames.add(AudioFile(c.getString(3), c.getString(0), c.getString(1), c.getString(2), (if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) c.getString(4)  else "")))
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    audioFileNames.add(AudioFile(c.getString(3), c.getString(0), c.getString(1), c.getString(2), c.getString(4)))
+                } else {
+                    if(!c.getString(3).replace(folderPath, "").contains("/")) {
+                        audioFileNames.add(AudioFile(c.getString(3), c.getString(0), c.getString(1), c.getString(2), ""))
+                    }
+                }
             }
         }
         c?.close()
@@ -161,7 +170,7 @@ class InitialActivity : AppCompatActivity() {
                     if (relPath !in relPathList) {
                         relPathList.add(relPath)
                         name = c.getString(0)
-                        folderPathList.add(FolderPath(c.getString(0), relPath.replace("$name/", "")))
+                        folderPathList.add(FolderPath(name, relPath.replace("$name/", "")))
                     }
                 }
             }
@@ -183,6 +192,7 @@ class InitialActivity : AppCompatActivity() {
                 relPath = c.getString(0).replace(c.getString(1), "")
                 if (relPath !in relPathList) {
                     relPathList.add(relPath)
+                    println(c.getString(0))
                     folderName = relPath.replace(regex = Regex("(.*/)([^/]*)(/[^/]*/)$"), replacement = "$3")
                     folderPathList.add(FolderPath(folderName.replace("/",""), relPath.replace(regex = Regex("(.*/)([^/]*)(/[^/]*/)$"), replacement = "$1$2")+"/"))
                 }
